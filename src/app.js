@@ -11,6 +11,7 @@ const patientRoutes = require('./routes/patient.routes');
 const consentRoutes = require('./routes/consent.routes'); // ✅ Phase 4
 const nfcRoutes = require('./routes/nfc.routes');         // ✅ Phase 5
 const auditRoutes = require('./routes/audit.routes');
+const otpRoutes = require('./routes/otp.routes');
 
 // Middleware
 const { protect } = require('./middleware/auth.middleware');
@@ -43,6 +44,9 @@ app.use('/api/nfc', nfcRoutes);
 
 // Audit Routes
 app.use('/api/audit', auditRoutes);
+
+// OTP Routes
+app.use('/api/otp', otpRoutes);
 
 // =====================
 // TEST & RBAC ROUTES
