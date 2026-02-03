@@ -58,7 +58,7 @@ exports.getMyConsentRequests = async (req, res) => {
     }
 
     const consents = await Consent.find({ patient: patient._id })
-      .populate('requester', 'name email role')
+      .populate('requester', 'name username role')
       .sort({ createdAt: -1 });
 
     res.json(consents);

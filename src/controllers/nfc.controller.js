@@ -55,7 +55,7 @@ exports.getPatientByNfc = async (req, res) => {
 
     // Find patient
     const patient = await Patient.findOne({ nfcUuid })
-      .populate('user', 'name email role');
+      .populate('user', 'name username role');
 
     if (!patient) {
       return res.status(404).json({

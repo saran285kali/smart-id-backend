@@ -37,7 +37,7 @@ exports.getMyPatientProfile = async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id }).populate(
       'user',
-      'name email role'
+      'name username role'
     );
 
     if (!patient) {

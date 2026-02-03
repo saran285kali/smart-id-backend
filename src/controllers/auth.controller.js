@@ -22,18 +22,20 @@ const generateToken = (user) => {
 //
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, username, password, role } = req.body;
 
-    // Check if user already exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+    if (!name || !username || !password || !role) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // Create user
+    const userExists = await User.findOne({ username });
+    if (userExists) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
     const user = await User.create({
       name,
-      email,
+      username,
       password,
       role
     });
@@ -44,7 +46,7 @@ exports.registerUser = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
+        username: user.username,
         role: user.role
       }
     });
@@ -59,18 +61,25 @@ exports.registerUser = async (req, res) => {
 //
 exports.loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password, role } = req.body;
 
-    // Find user
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password required' });
     }
 
-    // Compare password
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid username or password' });
+    }
+
+    if (role && user.role !== role) {
+      return res.status(403).json({ message: 'Role mismatch' });
+    }
+
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid username or password' });
     }
 
     res.json({
@@ -79,7 +88,7 @@ exports.loginUser = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
+        username: user.username,
         role: user.role
       }
     });

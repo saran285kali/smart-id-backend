@@ -55,7 +55,7 @@ router.get(
   async (req, res) => {
     try {
       const patient = await Patient.findById(req.params.patientId)
-        .populate('user', 'name email role');
+        .populate('user', 'name username role');
 
       if (!patient) {
         return res.status(404).json({ message: 'Patient not found' });
