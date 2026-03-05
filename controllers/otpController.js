@@ -4,10 +4,10 @@ import jwt from "jsonwebtoken";
 import LoginAudit from "../models/LoginAudit.js";
 
 export const sendOtp = async (req, res) => {
-    const { phone } = req.body;
-
     try {
-        // Additional Phone-Level Protection (using LoginAudit to track multiple requests)
+        const { phone } = req.body;
+
+        // Additional Phone-Level Protection (Security)
         const recentRequests = await LoginAudit.countDocuments({
             phone,
             status: "OTP_SENT",
@@ -23,12 +23,14 @@ export const sendOtp = async (req, res) => {
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         const expires = new Date(Date.now() + 5 * 60 * 1000);
 
+        // Save to Database (Required for verification)
         await Otp.findOneAndUpdate(
             { phone },
             { otp, expiresAt: expires, attempts: 0, createdAt: new Date() },
             { upsert: true }
         );
 
+        // Send SMS via Fast2SMS
         await sendSMS(phone, otp);
 
         // Record Audit Event
@@ -39,9 +41,19 @@ export const sendOtp = async (req, res) => {
             status: "OTP_SENT"
         });
 
-        res.json({ message: "OTP sent successfully" });
+        // Exact response format requested
+        res.json({
+            success: true,
+            message: "OTP sent",
+            otp // remove in production
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        // Exact error logging requested
+        console.error(err.response?.data || err);
+        res.status(500).json({
+            error: "SMS sending failed"
+        });
     }
 };
 
@@ -104,6 +116,7 @@ export const verifyOtp = async (req, res) => {
         });
 
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 };
