@@ -1,31 +1,30 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
-const protect = async (req, res, next) => {
-  let token;
+const authMiddleware = (req, res, next) => {
+  // 1. Get token from header (Standard: Bearer <token>)
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
 
-  // Check for token in Authorization header
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    try {
-      // Get token from header
-      token = req.headers.authorization.split(' ')[1];
-
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Attach user (without password)
-      req.user = await User.findById(decoded.id).select('-password');
-
-      return next();
-    } catch (error) {
-      return res.status(401).json({ message: 'Not authorized, token failed' });
-    }
+  if (!token) {
+    // MATCH: Axios interceptor will catch this 401
+    return res.status(401).json({ message: "Access Denied: No Token Provided" });
   }
 
-  return res.status(401).json({ message: 'Not authorized, no token' });
+  try {
+    // 2. Verify token
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 3. Attach user data to request object
+    req.user = verified;
+
+    next(); // Move to the actual route logic
+  } catch (err) {
+    // MATCH: Happens if token is expired, forged, or invalid
+    return res.status(401).json({ message: "Invalid or Expired Token" });
+  }
 };
 
-module.exports = { protect };
+// Polyfill for existing routes that use { protect }
+authMiddleware.protect = authMiddleware;
+
+module.exports = authMiddleware;
