@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from "axios";
 
 export const sendSMS = async (phone, otp) => {
     try {
@@ -15,13 +15,21 @@ export const sendSMS = async (phone, otp) => {
                     "Content-Type": "application/json"
                 }
             }
-        )
+        );
 
-        console.log(response.data)
-        return response.data
+        console.log("FAST2SMS SUCCESS:", response.data);
+
+        return response.data;
 
     } catch (error) {
-        console.error(error.response?.data || error)
-        throw new Error("SMS sending failed")
+        console.log("FAST2SMS ERROR ↓↓↓");
+
+        if (error.response) {
+            console.log(error.response.data);
+        } else {
+            console.log(error.message);
+        }
+
+        throw new Error("SMS sending failed");
     }
-}
+};

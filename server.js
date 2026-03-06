@@ -8,6 +8,8 @@ import patientRoutes from "./routes/patientRoutes.js";
 
 dotenv.config();
 
+console.log("FAST2SMS KEY LOADED:", process.env.FAST2SMS_API_KEY ? "YES" : "NO (Check Render Env Vars)");
+
 const app = express();
 
 app.use(cors());
