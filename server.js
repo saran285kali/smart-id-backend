@@ -11,7 +11,7 @@ dotenv.config();
 console.log("FAST2SMS KEY LOADED:", process.env.FAST2SMS_API_KEY ? "YES" : "NO (Check Render Env Vars)");
 
 const app = express();
-
+app.set("trust proxy", 1);
 app.use(cors());
 app.use(express.json());
 

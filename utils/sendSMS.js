@@ -3,7 +3,7 @@ import axios from "axios";
 export const sendSMS = async (phone, otp) => {
     try {
         const response = await axios.post(
-            "https://www.fast2sms.com/dev/bulkV2",
+            "https://www.fast2sms.com/api/v3/send",
             {
                 route: "otp",
                 variables_values: otp,
