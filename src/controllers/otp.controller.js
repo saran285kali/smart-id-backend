@@ -1,5 +1,6 @@
 import Otp from '../models/Otp.js';
 import { generateOTP } from '../utils/otp.js';
+import { sendSMS } from '../utils/sendSMS.js';
 
 // SEND OTP
 export const sendOtp = async (req, res) => {
@@ -14,6 +15,9 @@ export const sendOtp = async (req, res) => {
       purpose,
       expiresAt: new Date(Date.now() + 5 * 60 * 1000) // 5 mins
     });
+
+    // Send SMS via Fast2SMS
+    await sendSMS(phone, otp);
 
     // 🚨 For prototype only (SMS will replace this)
     console.log(`OTP for ${phone} (${purpose}): ${otp}`);
