@@ -12,8 +12,7 @@ const otpSchema = new mongoose.Schema(
     },
     purpose: {
       type: String,
-      enum: ['login', 'medical_access'],
-      required: true
+      default: 'login'
     },
     expiresAt: {
       type: Date,
