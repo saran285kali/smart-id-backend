@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
-import otpRoutes from "./routes/otpRoutes.js";
+import otpRoutes from "./src/routes/otpRoutes.js";
 import patientRoutes from "./routes/patientRoutes.js";
 
 
