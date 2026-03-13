@@ -1,9 +1,7 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
 
-//
 // 🔑 GENERATE JWT TOKEN
-//
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -17,10 +15,8 @@ const generateToken = (user) => {
   );
 };
 
-//
 // 🟢 REGISTER USER
-//
-exports.registerUser = async (req, res) => {
+export const registerUser = async (req, res) => {
   try {
     const { name, username, password, role } = req.body;
 
@@ -56,10 +52,8 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-//
 // 🔵 LOGIN USER
-//
-exports.loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const { username, password, role } = req.body;
 

@@ -1,6 +1,6 @@
-const AuditLog = require('../models/AuditLog');
+import AuditLog from '../models/AuditLog.js';
 
-const logAudit = async ({
+export const logAudit = async ({
   actor,
   actorRole,
   action,
@@ -21,5 +21,3 @@ const logAudit = async ({
     console.error('Audit log error:', error.message);
   }
 };
-
-module.exports = { logAudit };

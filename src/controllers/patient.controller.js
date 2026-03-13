@@ -1,11 +1,8 @@
-const Patient = require('../models/Patient');
+import Patient from '../models/Patient.js';
 
-//
-// 🟢 CREATE PATIENT PROFILE (Patient only, once)
-//
-exports.createPatientProfile = async (req, res) => {
+// 🟢 CREATE PATIENT PROFILE
+export const createPatientProfile = async (req, res) => {
   try {
-    // Check if patient profile already exists
     const existingPatient = await Patient.findOne({ user: req.user._id });
     if (existingPatient) {
       return res.status(400).json({
@@ -30,10 +27,8 @@ exports.createPatientProfile = async (req, res) => {
   }
 };
 
-//
 // 🔵 GET OWN PATIENT PROFILE
-//
-exports.getMyPatientProfile = async (req, res) => {
+export const getMyPatientProfile = async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id }).populate(
       'user',
@@ -55,10 +50,8 @@ exports.getMyPatientProfile = async (req, res) => {
   }
 };
 
-//
 // 🟡 UPDATE OWN PATIENT PROFILE
-//
-exports.updateMyPatientProfile = async (req, res) => {
+export const updateMyPatientProfile = async (req, res) => {
   try {
     const patient = await Patient.findOneAndUpdate(
       { user: req.user._id },

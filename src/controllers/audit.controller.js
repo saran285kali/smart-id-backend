@@ -1,8 +1,8 @@
-const AuditLog = require('../models/AuditLog');
+import AuditLog from '../models/AuditLog.js';
 
-exports.getMyAuditLogs = async (req, res) => {
+export const getMyAuditLogs = async (req, res) => {
   try {
-    const logs = await AuditLog.find({ actor: req.user._id })
+    const logs = await AuditLog.find({ actor: req.user.id }) // Assuming req.user.id from generateToken
       .populate('patient', 'fullName')
       .sort({ createdAt: -1 });
 

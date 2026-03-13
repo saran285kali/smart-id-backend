@@ -1,14 +1,13 @@
-const express = require("express");
+import express from "express";
+import { protect } from "../middleware/auth.middleware.js";
+import { getPatientByNfc } from "../controllers/nfc.controller.js";
+
 const router = express.Router();
-const authMiddleware = require("../middleware/auth.middleware");
 
 // 🏥 Scan NFC (Simplified/Auth version for demo)
-// This matches the user's request for a protected NFC route
-router.get("/patients/nfc/:id", authMiddleware, async (req, res) => {
+router.get("/patients/nfc/:id", protect, async (req, res) => {
     try {
-        // The user ID/role from the token is now available in req.user
-        // Note: the mock JWT I created earlier used 'userId'
-        console.log(`Request from user: ${req.user.userId || req.user._id}`);
+        console.log(`Request from user: ${req.user.id}`);
 
         // Logic to fetch patient from DB... (Mocked for now)
         res.json({
@@ -25,8 +24,7 @@ router.get("/patients/nfc/:id", authMiddleware, async (req, res) => {
     }
 });
 
-// Keep original for compatibility if needed, but updated to use new middleware
-const { getPatientByNfc } = require("../controllers/nfc.controller");
-router.get("/patient/:nfcId", authMiddleware.protect, getPatientByNfc);
+// Primary lookup route
+router.get("/patient/:nfcId", protect, getPatientByNfc);
 
-module.exports = router;
+export default router;

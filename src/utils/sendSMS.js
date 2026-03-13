@@ -2,28 +2,34 @@ import axios from "axios";
 
 export const sendSMS = async (phone, otp) => {
     try {
-
-        const response = await axios.get(
-            "https://www.fast2sms.com/dev/bulkV2",
+        const response = await axios.post(
+            "https://www.fast2sms.com/api/v3/send",
             {
-                params: {
+                route: "otp",
+                variables_values: otp,
+                numbers: phone
+            },
+            {
+                headers: {
                     authorization: process.env.FAST2SMS_API_KEY,
-                    route: "otp",
-                    variables_values: otp,
-                    numbers: phone
+                    "Content-Type": "application/json"
                 }
             }
         );
 
-        console.log("FAST2SMS RESPONSE:", response.data);
+        console.log("FAST2SMS SUCCESS:", response.data);
 
-        if (!response.data.return) {
-            throw new Error("SMS sending failed");
-        }
+        return response.data;
 
     } catch (error) {
         console.log("FAST2SMS ERROR ↓↓↓");
-        console.log(error.response?.data || error.message);
+
+        if (error.response) {
+            console.log(error.response.data);
+        } else {
+            console.log(error.message);
+        }
+
         throw new Error("SMS sending failed");
     }
 };

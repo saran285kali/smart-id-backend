@@ -1,9 +1,9 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
+import { getMyAuditLogs } from '../controllers/audit.controller.js';
+import { protect } from '../middleware/auth.middleware.js';
 
-const { getMyAuditLogs } = require('../controllers/audit.controller');
-const { protect } = require('../middleware/auth.middleware');
+const router = express.Router();
 
 router.get('/my', protect, getMyAuditLogs);
 
-module.exports = router;
+export default router;

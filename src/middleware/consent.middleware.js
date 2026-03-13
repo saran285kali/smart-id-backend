@@ -1,16 +1,15 @@
-const mongoose = require('mongoose');
-const Consent = require('../models/Consent');
-const Patient = require('../models/Patient');
-const { logAudit } = require('../utils/auditLogger');
+import mongoose from 'mongoose';
+import Consent from '../models/Consent.js';
+import Patient from '../models/Patient.js';
+import { logAudit } from '../utils/auditLogger.js';
 
-const checkConsent = async (req, res, next) => {
+export const checkConsent = async (req, res, next) => {
   try {
     const { patientId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(patientId)) {
-      // 🔴 Log invalid ID attempt
       await logAudit({
-        actor: req.user._id,
+        actor: req.user.id,
         actorRole: req.user.role,
         action: 'VIEW_PATIENT_PROFILE_DENIED',
         patient: patientId,
@@ -24,12 +23,10 @@ const checkConsent = async (req, res, next) => {
       });
     }
 
-    // Find patient
     const patient = await Patient.findById(patientId);
     if (!patient) {
-      // 🔴 Log patient not found attempt
       await logAudit({
-        actor: req.user._id,
+        actor: req.user.id,
         actorRole: req.user.role,
         action: 'VIEW_PATIENT_PROFILE_DENIED',
         patient: patientId,
@@ -41,18 +38,16 @@ const checkConsent = async (req, res, next) => {
       return res.status(404).json({ message: 'Patient not found' });
     }
 
-    // Find valid consent
     const consent = await Consent.findOne({
       patient: patientId,
-      requester: req.user._id,
+      requester: req.user.id,
       status: 'approved',
       validTill: { $gt: new Date() }
     });
 
     if (!consent) {
-      // 🔴 Log access denied (no valid consent)
       await logAudit({
-        actor: req.user._id,
+        actor: req.user.id,
         actorRole: req.user.role,
         action: 'VIEW_PATIENT_PROFILE_DENIED',
         patient: patientId,
@@ -66,9 +61,8 @@ const checkConsent = async (req, res, next) => {
       });
     }
 
-    // 🟢 Log access allowed
     await logAudit({
-      actor: req.user._id,
+      actor: req.user.id,
       actorRole: req.user.role,
       action: 'VIEW_PATIENT_PROFILE_ALLOWED',
       patient: patientId,
@@ -76,7 +70,6 @@ const checkConsent = async (req, res, next) => {
       ipAddress: req.ip
     });
 
-    // Consent valid → allow access
     next();
   } catch (error) {
     console.error(error);
@@ -85,5 +78,3 @@ const checkConsent = async (req, res, next) => {
     });
   }
 };
-
-module.exports = { checkConsent };

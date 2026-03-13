@@ -1,23 +1,19 @@
-const Consent = require('../models/Consent');
-const Patient = require('../models/Patient');
+import Consent from '../models/Consent.js';
+import Patient from '../models/Patient.js';
 
-//
 // 🟢 REQUEST CONSENT (Doctor / Hospital)
-//
-exports.requestConsent = async (req, res) => {
+export const requestConsent = async (req, res) => {
   try {
     const { patientId, purpose, validTill } = req.body;
 
-    // Check patient exists
     const patient = await Patient.findById(patientId);
     if (!patient) {
       return res.status(404).json({ message: 'Patient not found' });
     }
 
-    // Prevent duplicate active consent
     const existingConsent = await Consent.findOne({
       patient: patientId,
-      requester: req.user._id,
+      requester: req.user.id,
       status: { $in: ['pending', 'approved'] }
     });
 
@@ -29,7 +25,7 @@ exports.requestConsent = async (req, res) => {
 
     const consent = await Consent.create({
       patient: patientId,
-      requester: req.user._id,
+      requester: req.user.id,
       requesterRole: req.user.role,
       purpose,
       validTill
@@ -47,12 +43,10 @@ exports.requestConsent = async (req, res) => {
   }
 };
 
-//
 // 🔵 VIEW MY CONSENT REQUESTS (Patient)
-//
-exports.getMyConsentRequests = async (req, res) => {
+export const getMyConsentRequests = async (req, res) => {
   try {
-    const patient = await Patient.findOne({ user: req.user._id });
+    const patient = await Patient.findOne({ user: req.user.id });
     if (!patient) {
       return res.status(404).json({ message: 'Patient profile not found' });
     }
@@ -70,10 +64,8 @@ exports.getMyConsentRequests = async (req, res) => {
   }
 };
 
-//
 // 🟡 APPROVE OR REJECT CONSENT (Patient)
-//
-exports.respondToConsent = async (req, res) => {
+export const respondToConsent = async (req, res) => {
   try {
     const { consentId, action } = req.body;
 
@@ -101,10 +93,8 @@ exports.respondToConsent = async (req, res) => {
   }
 };
 
-//
 // 🔴 REVOKE CONSENT (Patient)
-//
-exports.revokeConsent = async (req, res) => {
+export const revokeConsent = async (req, res) => {
   try {
     const { consentId } = req.body;
 

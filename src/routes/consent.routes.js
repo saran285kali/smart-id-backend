@@ -1,15 +1,14 @@
-const express = require('express');
-const router = express.Router();
-
-const {
+import express from 'express';
+import {
   requestConsent,
   getMyConsentRequests,
   respondToConsent,
   revokeConsent
-} = require('../controllers/consent.controller');
+} from '../controllers/consent.controller.js';
+import { protect } from '../middleware/auth.middleware.js';
+import { authorizeRoles } from '../middleware/role.middleware.js';
 
-const { protect } = require('../middleware/auth.middleware');
-const { authorizeRoles } = require('../middleware/role.middleware');
+const router = express.Router();
 
 // 🧑‍⚕️ / 🏥 Request consent (Doctor / Hospital)
 router.post(
@@ -43,4 +42,4 @@ router.post(
   revokeConsent
 );
 
-module.exports = router;
+export default router;

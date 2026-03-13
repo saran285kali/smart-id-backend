@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const consentSchema = new mongoose.Schema(
   {
@@ -52,4 +52,4 @@ const consentSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Consent', consentSchema);
+export default mongoose.model('Consent', consentSchema);

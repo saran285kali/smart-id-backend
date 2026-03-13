@@ -1,18 +1,16 @@
-const express = require('express');
-const router = express.Router();
-const { logAudit } = require('../utils/auditLogger');
-
-const {
+import express from 'express';
+import { logAudit } from '../utils/auditLogger.js';
+import {
   createPatientProfile,
   getMyPatientProfile,
   updateMyPatientProfile
-} = require('../controllers/patient.controller');
+} from '../controllers/patient.controller.js';
+import { protect } from '../middleware/auth.middleware.js';
+import { authorizeRoles } from '../middleware/role.middleware.js';
+import { checkConsent } from '../middleware/consent.middleware.js';
+import Patient from '../models/Patient.js';
 
-const { protect } = require('../middleware/auth.middleware');
-const { authorizeRoles } = require('../middleware/role.middleware');
-const { checkConsent } = require('../middleware/consent.middleware'); // ✅ NEW
-
-const Patient = require('../models/Patient');
+const router = express.Router();
 
 // ===============================
 // PATIENT SELF-SERVICE ROUTES
@@ -80,4 +78,4 @@ router.get(
   }
 );
 
-module.exports = router;
+export default router;
