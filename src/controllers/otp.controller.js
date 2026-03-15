@@ -1,5 +1,4 @@
 import Otp from "../models/Otp.js";
-import { sendSMS } from "../utils/sendSMS.js";
 import jwt from "jsonwebtoken";
 import LoginAudit from "../models/LoginAudit.js";
 
@@ -31,8 +30,12 @@ export const sendOtp = async (req, res) => {
             { upsert: true }
         );
 
-        // Send SMS via Fast2SMS
-        await sendSMS(phone, otp);
+        // Send SMS via Raspberry Pi GSM Module
+        await fetch("http://raspberrypi-ip:5000/send-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phone, otp })
+        });
 
         // Record Audit Event
         await LoginAudit.create({
