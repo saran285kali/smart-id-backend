@@ -48,15 +48,13 @@ io.on("connection", (socket) => {
     io.emit("nfc_scanned", { uid: data.uid });
 
     try {
-      // Step 2: Fetch real patient from MongoDB Atlas
+      // Fetch real patient from MongoDB Atlas
       const patient = await Patient.findOne({ nfcUuid: data.uid })
         .populate('user', 'name username role');
         
       if (patient) {
-        // Prepare patient data format with mock prescriptions added if needed,
-        // or just send the pure document.
         const patientData = patient.toObject();
-        // Fallback prescriptions if none exist in the model for the pharmacy view
+        // Fallback prescriptions
         if (!patientData.prescriptions) {
            patientData.prescriptions = [
              { name: "Paracetamol 500mg" },
@@ -71,6 +69,31 @@ io.on("connection", (socket) => {
       }
     } catch (err) {
       console.error("Error fetching patient from DB via WebSocket:", err);
+    }
+  });
+
+  // Listen for fingerprint verification from Raspberry Pi
+  socket.on("fingerprint_verified", async (data) => {
+    console.log("Biometric verification received:", data);
+    
+    try {
+      // Find patient matching both hardware hardware identifiers
+      const patient = await Patient.findOne({
+        nfcUuid: data.uid,
+        fingerprintId: data.finger_id // Raspberry Pi sends 'finger_id'
+      }).populate('user', 'name username role');
+
+      if (!patient) {
+        console.log("Access Denied: Biometric or NFC mismatch");
+        io.emit("access_denied", { message: "Biometric or NFC mismatch" });
+        return;
+      }
+
+      const patientData = patient.toObject();
+      io.emit("patient_data", patientData);
+      console.log("Multifactor Auth Success: Emitted data for", patient.fullName);
+    } catch (err) {
+      console.error("Biometric DB Lookup Error:", err);
     }
   });
 
