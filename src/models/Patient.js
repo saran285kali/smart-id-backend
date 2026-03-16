@@ -17,6 +17,13 @@ const patientSchema = new mongoose.Schema(
       sparse: true // allows patients without NFC initially
     },
 
+    // 👆 Fingerprint Template ID (Hardware Integration)
+    fingerprintId: {
+      type: Number,
+      unique: true,
+      sparse: true
+    },
+
     fullName: {
       type: String,
       required: true,
