@@ -1,5 +1,6 @@
 import express from "express";
 import { protect } from "../middleware/auth.middleware.js";
+import Patient from "../models/Patient.js";
 import { 
     handleNfcScan, 
     verifyFingerprint, 
@@ -30,13 +31,17 @@ router.post("/generate-otp", generateHardwareOtp);
 // 🏥 Scan NFC (Simplified/Auth version for demo dashboards)
 router.get("/patients/nfc/:id", protect, async (req, res) => {
     try {
-        console.log(`Request from user: ${req.user.id}`);
+        const patient = await Patient.findOne({ nfcUuid: req.params.id })
+            .populate('user', 'name username');
+            
+        if (!patient) return res.status(404).json({ message: "Patient not found" });
 
         res.json({
             id: req.params.id,
-            name: "John Doe",
-            age: 42,
-            gender: "Male",
+            name: patient.fullName || "Unknown",
+            age: patient.age,
+            gender: patient.gender,
+            phone: patient.phone,
             condition: "Cardiology Consultation",
             time: new Date().toLocaleString()
         });
