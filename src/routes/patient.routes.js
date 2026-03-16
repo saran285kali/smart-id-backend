@@ -78,4 +78,26 @@ router.get(
   }
 );
 
+// ===============================
+// NFC DIRECT GET ROUTE
+// ===============================
+
+// Get patient via NFC UID (fallback wrapper if accessed via /api/patient/:uid rather than /api/nfc/patient/:uid)
+router.get(
+  '/:uid',
+  async (req, res) => {
+    try {
+      const patient = await Patient.findOne({
+        nfcUuid: req.params.uid
+      });
+      res.json(patient);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message: 'Server error while fetching NFC profile'
+      });
+    }
+  }
+);
+
 export default router;
