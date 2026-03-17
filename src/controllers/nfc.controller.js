@@ -10,11 +10,7 @@ export const handleNfcScan = async (req, res) => {
       return res.status(400).json({ message: "NFC UID is required" });
     }
 
-    // Emit the raw scan event to frontend in real-time
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("nfc_scanned", { uid });
-    }
+    console.log("NFC UID received:", uid);
 
     const patient = await Patient.findOne({ nfcUuid: uid })
       .populate('user', 'name username role');

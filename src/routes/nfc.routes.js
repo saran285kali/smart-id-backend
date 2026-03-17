@@ -15,7 +15,13 @@ const router = express.Router();
 // ==========================================
 
 // 1️⃣ Raspberry Pi posts NFC UID
-router.post("/scan", handleNfcScan);
+router.post("/scan", (req, res) => {
+  const { uid } = req.body;
+
+  console.log("NFC UID:", uid);
+
+  res.json({ success: true, uid });
+});
 
 // 2️⃣ Raspberry Pi posts Fingerprint matches
 router.post("/fingerprint", verifyFingerprint);
