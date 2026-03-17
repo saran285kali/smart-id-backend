@@ -19,7 +19,8 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  transports: ["websocket", "polling"]
 });
 
 app.set("io", io);
@@ -102,6 +103,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Server (with WebSockets) running on ${PORT}`);
+server.listen(process.env.PORT || 5000, () => {
+  console.log(`Server (with WebSockets) running on ${process.env.PORT || 5000}`);
 });
