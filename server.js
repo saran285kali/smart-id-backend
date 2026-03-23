@@ -12,6 +12,7 @@ import auditRoutes from "./src/routes/audit.routes.js";
 import otpRoutes from "./src/routes/otpRoutes.js";
 import userRoutes from "./src/routes/user.routes.js";
 import { getStats, getLogs } from "./src/controllers/user.controller.js";
+import statusRoutes from "./routes/statusRoutes.js";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use("/api/consent", consentRoutes);
 app.use("/api/nfc", nfcRoutes);
 app.use("/api/audit", auditRoutes);
 app.use("/api/otp", otpRoutes);
+app.use("/api/status", statusRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend running without WebSocket 🚀");
