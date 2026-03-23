@@ -10,6 +10,8 @@ import consentRoutes from "./src/routes/consent.routes.js";
 import nfcRoutes from "./src/routes/nfc.routes.js";
 import auditRoutes from "./src/routes/audit.routes.js";
 import otpRoutes from "./src/routes/otpRoutes.js";
+import userRoutes from "./src/routes/user.routes.js";
+import { getStats, getLogs } from "./src/controllers/user.controller.js";
 
 dotenv.config();
 
@@ -26,6 +28,13 @@ mongoose.connect(process.env.MONGO_URI)
 /* ===================== */
 /* ROUTES                */
 /* ===================== */
+
+// Hardware & User Management Routes
+app.use("/api/users", userRoutes);
+
+// Stats & Logs
+app.get("/api/stats", getStats);
+app.get("/api/logs", getLogs);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/patient", patientRoutes);

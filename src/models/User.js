@@ -10,27 +10,45 @@ const userSchema = new mongoose.Schema(
 
     username: {
       type: String,
-      required: true,
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      sparse: true // Allow users without usernames (hardware-only patients)
     },
 
     email: {
       type: String,
       required: false,
-      default: null
+      default: null,
+      sparse: true
     },
 
     password: {
       type: String,
-      required: true
+      required: false // Optional for hardware-only patients
     },
 
     role: {
       type: String,
-      enum: ['patient', 'doctor', 'hospital', 'medical_shop', 'admin'],
+      default: 'Patient',
       required: true
+    },
+
+    nfcId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+
+    fingerprintId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+
+    phone: {
+      type: String,
+      required: false
     }
   },
   { timestamps: true }
@@ -38,7 +56,7 @@ const userSchema = new mongoose.Schema(
 
 // 🔐 Hash password
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) return;
+  if (!this.password || !this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 

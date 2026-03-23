@@ -8,10 +8,8 @@ import consentRoutes from './routes/consent.routes.js';
 import nfcRoutes from './routes/nfc.routes.js';
 import auditRoutes from './routes/audit.routes.js';
 import otpRoutes from './routes/otpRoutes.js';
-
-// Middleware
-import { protect } from './middleware/auth.middleware.js';
-import { authorizeRoles } from './middleware/role.middleware.js';
+import userRoutes from './routes/user.routes.js';
+import { getStats, getLogs } from './controllers/user.controller.js';
 
 const app = express();
 
@@ -22,6 +20,13 @@ app.use(express.json());
 // =====================
 // ROUTES
 // =====================
+
+// Hardware & User Management Routes
+app.use('/api/users', userRoutes);
+
+// Stats & Logs Simplified APIs
+app.get('/api/stats', getStats);
+app.get('/api/logs', getLogs);
 
 // Auth Routes (Username/Password)
 app.use('/api/auth', authRoutes);
