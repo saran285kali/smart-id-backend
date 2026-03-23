@@ -2,7 +2,8 @@ import express from "express";
 import { protect } from "../middleware/auth.middleware.js";
 import Patient from "../models/Patient.js";
 import { 
-    handleNfcScan, 
+    receiveNfc,
+    getLatestNfc,
     verifyFingerprint, 
     generateHardwareOtp,
     getPatientByNfc 
@@ -11,30 +12,26 @@ import {
 const router = express.Router();
 
 // ==========================================
-// 🔴 HARDWARE INTEGRATION ROUTES (Raspberry Pi)
+// 🔴 REAL HARDWARE INTEGRATION (Raspberry Pi)
 // ==========================================
 
-// 1️⃣ Raspberry Pi posts NFC UID
-router.post("/scan", (req, res) => {
-  const { uid } = req.body;
+// 1. RECEIVE NFC FROM HARDWARE (POST /api/nfc)
+router.post("/", receiveNfc);
 
-  console.log("NFC UID:", uid);
+// 2. FETCH NFC FOR FRONTEND (GET /api/nfc)
+router.get("/", getLatestNfc);
 
-  res.json({ success: true, uid });
-});
-
-// 2️⃣ Raspberry Pi posts Fingerprint matches
+// 3. FINGERPRINT VERIFICATION
 router.post("/fingerprint", verifyFingerprint);
 
-// 3️⃣ Raspberry Pi requests OTP to send via SIM800L
+// 4. GENERATE OTP FOR SIM800L
 router.post("/generate-otp", generateHardwareOtp);
 
-
 // ==========================================
-// 🔵 FRONTEND ROUTES (User/Doctor interactions)
+// 🔵 OTHER PATIENT LOOKUP ROUTES
 // ==========================================
 
-// 🏥 Scan NFC (Simplified/Auth version for demo dashboards)
+// Dashboard Auth Scan
 router.get("/patients/nfc/:id", protect, async (req, res) => {
     try {
         const patient = await Patient.findOne({ nfcUuid: req.params.id })
@@ -57,7 +54,6 @@ router.get("/patients/nfc/:id", protect, async (req, res) => {
     }
 });
 
-// Primary lookup route via GET
 router.get("/patient/:nfcId", protect, getPatientByNfc);
 
 export default router;

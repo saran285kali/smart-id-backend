@@ -1,6 +1,42 @@
 import Patient from '../models/Patient.js';
 import Otp from '../models/Otp.js';
 
+// TEMP STORAGE FOR NFC
+let latestNfc = null;
+
+// 1. Receive NFC from Raspberry Pi
+export const receiveNfc = async (req, res) => {
+  const { nfcId } = req.body;
+
+  if (!nfcId) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "nfcId is required" 
+    });
+  }
+
+  latestNfc = nfcId;
+  console.log("Real NFC Received from Hardware:", latestNfc);
+
+  res.json({ 
+    success: true, 
+    message: "NFC received successfully",
+    nfcId: latestNfc
+  });
+};
+
+// 2. Fetch NFC for Frontend
+export const getLatestNfc = async (req, res) => {
+  const currentNfc = latestNfc;
+  
+  // Clear after use (Optional but requested)
+  latestNfc = null;
+
+  res.json({
+    nfcId: currentNfc
+  });
+};
+
 // 1️⃣ Handle NFC Card Tap (from Raspberry Pi)
 export const handleNfcScan = async (req, res) => {
   try {
