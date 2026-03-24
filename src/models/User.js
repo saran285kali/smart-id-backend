@@ -36,14 +36,14 @@ const userSchema = new mongoose.Schema(
 
     nfcId: {
       type: String,
-      unique: true,
-      sparse: true
+      required: true,
+      unique: true
     },
 
     fingerprintId: {
-      type: String,
-      unique: true,
-      sparse: true
+      type: Number,
+      required: true,
+      unique: true
     },
 
     phone: {

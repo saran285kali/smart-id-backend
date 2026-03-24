@@ -88,7 +88,7 @@ router.get(
   async (req, res) => {
     try {
       const patient = await Patient.findOne({
-        nfcUuid: req.params.uid
+        nfcId: req.params.uid
       });
       res.json(patient);
     } catch (error) {

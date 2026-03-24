@@ -34,7 +34,7 @@ router.post("/generate-otp", generateHardwareOtp);
 // Dashboard Auth Scan
 router.get("/patients/nfc/:id", protect, async (req, res) => {
     try {
-        const patient = await Patient.findOne({ nfcUuid: req.params.id })
+        const patient = await Patient.findOne({ nfcId: req.params.id })
             .populate('user', 'name username');
             
         if (!patient) return res.status(404).json({ message: "Patient not found" });

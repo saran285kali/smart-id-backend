@@ -10,18 +10,18 @@ const patientSchema = new mongoose.Schema(
       unique: true
     },
 
-    // 🪪 NFC Card UUID (Phase 5)
-    nfcUuid: {
+    // 🪪 NFC Card ID (Hardware Integration)
+    nfcId: {
       type: String,
-      unique: true,
-      sparse: true // allows patients without NFC initially
+      required: true,
+      unique: true
     },
 
     // 👆 Fingerprint Template ID (Hardware Integration)
     fingerprintId: {
       type: Number,
-      unique: true,
-      sparse: true
+      required: true,
+      unique: true
     },
 
     fullName: {

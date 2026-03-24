@@ -1,33 +1,52 @@
 import User from '../models/User.js';
 import Log from '../models/Log.js';
 
-// @desc Create new user (Hardware Registration)
+import Patient from '../models/Patient.js';
+
+// @desc Create new user (Hardware & Patient Registration)
 // @route POST /api/users
 export const registerUser = async (req, res) => {
-  const { name, role, nfcId, fingerprintId, phone } = req.body;
+  const { 
+    name, 
+    role, 
+    nfcId, 
+    fingerprintId, 
+    phone, 
+    age, 
+    gender, 
+    bloodGroup, 
+    address, 
+    emergencyContact,
+    medicalHistory,
+    allergies
+  } = req.body;
 
   try {
-    // Check if user with same nfcId or fingerprintId already exists
-    if (nfcId) {
-      const nfcExists = await User.findOne({ nfcId });
-      if (nfcExists) {
-        return res.status(400).json({ 
-          success: false, 
-          message: `NFC ID ${nfcId} is already registered.` 
-        });
-      }
+    // ✅ 1. Mandatory Hardware Data (Reject if missing)
+    if (!fingerprintId || !nfcId) {
+      return res.status(400).json({
+        message: "Fingerprint and NFC are required"
+      });
     }
 
-    if (fingerprintId) {
-      const fpExists = await User.findOne({ fingerprintId });
-      if (fpExists) {
-        return res.status(400).json({ 
-          success: false, 
-          message: `Fingerprint ID ${fingerprintId} is already registered.` 
-        });
-      }
+    // ✅ 2. Prevent Duplicate Fingerprint
+    const existingFingerprint = await User.findOne({ fingerprintId });
+    if (existingFingerprint) {
+      return res.status(400).json({
+        message: "Fingerprint already registered"
+      });
     }
 
+    // ✅ 3. Prevent Duplicate NFC Card
+    const existingNfc = await User.findOne({ nfcId });
+    if (existingNfc) {
+      return res.status(400).json({
+        message: "Card already linked to another patient"
+      });
+    }
+
+    // ✅ 6. Atomic Registration (ALL OR NOTHING)
+    // Create the User account
     const user = await User.create({
       name,
       role: role || 'Patient',
@@ -36,17 +55,36 @@ export const registerUser = async (req, res) => {
       phone
     });
 
+    // Create the linked Patient profile
+    await Patient.create({
+      user: user._id,
+      nfcId,
+      fingerprintId,
+      fullName: name,
+      age,
+      gender,
+      bloodGroup,
+      phone,
+      address,
+      emergencyContact,
+      medicalHistory,
+      allergies
+    });
+
     // Create log for registration
     await Log.create({
       eventType: 'REGISTRATION',
       userId: user._id,
-      message: `User ${name} registered via hardware.`
+      message: `Patient ${name} registered successfully with hardware.`
     });
 
+    // ✅ 7. Return Clean Success Response
     res.status(201).json({
-      success: true,
-      data: user
+      message: "Patient registered successfully",
+      patientId: user._id,
+      nfcId: user.nfcId
     });
+
   } catch (error) {
     console.error('Registration Error:', error);
     res.status(500).json({ 

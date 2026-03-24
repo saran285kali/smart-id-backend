@@ -48,7 +48,7 @@ export const handleNfcScan = async (req, res) => {
 
     console.log("NFC UID received:", uid);
 
-    const patient = await Patient.findOne({ nfcUuid: uid })
+    const patient = await Patient.findOne({ nfcId: uid })
       .populate('user', 'name username role');
 
     if (!patient) {
@@ -146,7 +146,7 @@ export const getPatientByNfc = async (req, res) => {
   try {
     const { nfcId } = req.params;
 
-    const patient = await Patient.findOne({ nfcUuid: nfcId })
+    const patient = await Patient.findOne({ nfcId: nfcId })
       .populate('user', 'name username role');
 
     if (!patient) {
