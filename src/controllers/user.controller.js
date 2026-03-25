@@ -41,7 +41,7 @@ export const registerUser = async (req, res) => {
     const existingNfc = await User.findOne({ nfcId });
     if (existingNfc) {
       return res.status(400).json({
-        message: "Card already linked to another patient"
+        message: "Card already used"
       });
     }
 
@@ -80,9 +80,7 @@ export const registerUser = async (req, res) => {
 
     // ✅ 7. Return Clean Success Response
     res.status(201).json({
-      message: "Patient registered successfully",
-      patientId: user._id,
-      nfcId: user.nfcId
+      message: "Patient registered successfully"
     });
 
   } catch (error) {
